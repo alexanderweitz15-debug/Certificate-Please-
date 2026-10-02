@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Certificate Please!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#D9E3DC; --surface:#F2F6EE; --raised:#FBFDF8; --ink:#16302B; --muted:#56695F;
+  --line:#AFC0B5; --guil:rgba(22,48,43,.07); --ok:#1D6A48; --no:#B3312A; --signal:#E6B21E;
+  --flag:#FBE6A4; --focus:#2B3F8C;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1E1B; --surface:#182C28; --raised:#203833; --ink:#E3ECE6; --muted:#9CB0A7;
+    --line:#35524B; --guil:rgba(227,236,230,.06); --ok:#63C493; --no:#F08277; --signal:#EFC23F;
+    --flag:#5A4A12; --focus:#9FB0FF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1E1B; --surface:#182C28; --raised:#203833; --ink:#E3ECE6; --muted:#9CB0A7;
+  --line:#35524B; --guil:rgba(227,236,230,.06); --ok:#63C493; --no:#F08277; --signal:#EFC23F;
+  --flag:#5A4A12; --focus:#9FB0FF;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.5 Barlow,"Segoe UI",system-ui,sans-serif}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;line-height:1.1;margin:0}
+h1{font-size:clamp(2.4rem,7vw,4rem);letter-spacing:-.01em}
+h2{font-size:1.75rem}
+h3{font-size:1.25rem}
+p{margin:0 0 .8em;max-width:68ch}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.mono{font-family:"Courier Prime","Courier New",monospace}
+
+.top{border-bottom:1px solid var(--line);background:var(--surface)}
+.top::before{content:"";display:block;height:8px;background:repeating-linear-gradient(-45deg,var(--signal) 0 14px,var(--ink) 14px 28px)}
+.top-in{max-width:1080px;margin:0 auto;padding:.6rem 1rem;display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;align-items:center}
+.brand{font:700 1.5rem/1 "Barlow Condensed","Arial Narrow",sans-serif;background:none;border:0;padding:.2rem 0}
+nav{display:flex;gap:.25rem;flex-wrap:wrap}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:.35rem .6rem;font-weight:500}
+nav button[aria-current="page"]{border-bottom-color:var(--ink)}
+
+main{max-width:1080px;margin:0 auto;padding:1.25rem 1rem 3rem}
+.lead{font-size:1.2rem;max-width:56ch}
+.btn{border:2px solid var(--ink);background:var(--ink);color:var(--surface);padding:.6rem 1.1rem;border-radius:4px;font-weight:600}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.small{padding:.35rem .8rem;font-size:.95rem}
+
+/* Übersicht */
+.shifts{list-style:none;margin:1.5rem 0;padding:0;border-top:2px solid var(--ink)}
+.shifts li{display:grid;grid-template-columns:3rem 1fr auto;gap:.25rem 1rem;align-items:center;padding:.9rem 0;border-bottom:1px solid var(--line)}
+.shifts .num{font:700 2.2rem/1 "Barlow Condensed","Arial Narrow",sans-serif;color:var(--muted)}
+.shifts .best{color:var(--muted);font-size:.95rem}
+.more{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:1.5rem}
+.more > div{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1rem}
+
+/* Briefing */
+.brief{background:var(--surface);border:1px solid var(--line);border-left:8px solid var(--signal);border-radius:6px;padding:1.25rem;max-width:720px}
+.brief h2{margin-bottom:.6rem}
+.brief ul{margin:.2rem 0 1rem;padding-left:1.2rem}
+
+/* Spiel */
+.status{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:center;margin-bottom:.9rem}
+.status h2{font-size:1.4rem}
+.pips{display:flex;gap:4px}
+.pips i{width:16px;height:16px;border:2px solid var(--ink);border-radius:2px;display:block}
+.pips i.r{background:var(--ok);border-color:var(--ok)}
+.pips i.w{background:var(--no);border-color:var(--no)}
+.pips i.cur{background:var(--signal)}
+.points{margin-left:auto;font-weight:600}
+.booth{display:grid;gap:1rem;grid-template-columns:300px 1fr;grid-template-areas:"ask cert" "tools cert" "act act";align-items:start}
+.ask{grid-area:ask}.cert{grid-area:cert}.tools{grid-area:tools}.act{grid-area:act}
+@media (max-width:820px){.booth{grid-template-columns:1fr;grid-template-areas:"ask" "cert" "tools" "act"}}
+
+.ask{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:.9rem;display:grid;grid-template-columns:56px 1fr;gap:.2rem .8rem;align-items:center}
+.srv{width:56px;height:auto;grid-row:span 2}
+.ask small,.tools small,.cert small{display:block;color:var(--muted);font-size:.85rem}
+.target{font-weight:700;font-size:.95rem;overflow-wrap:anywhere}
+.bubble{background:var(--raised);border:1px solid var(--line);border-radius:10px 10px 10px 2px;padding:.35rem .6rem;font-size:.95rem;overflow-wrap:anywhere}
+
+.tools{display:grid;gap:.6rem}
+.tool{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:.7rem .9rem}
+.tool.flag{background:var(--flag);border-color:var(--no)}
+.tool ul{margin:.2rem 0 0;padding:0;list-style:none}
+.clock{font-size:1.35rem;font-weight:700}
+
+.cert{position:relative;background-color:var(--raised);background-image:repeating-radial-gradient(circle at 100% 0,transparent 0 11px,var(--guil) 11px 12px),repeating-radial-gradient(circle at 0 100%,transparent 0 11px,var(--guil) 11px 12px);border:1px solid var(--ink);border-radius:8px;padding:1.1rem 1.2rem 1.3rem;box-shadow:4px 4px 0 var(--line);overflow:hidden}
+.cert header{display:flex;justify-content:space-between;gap:1rem;align-items:baseline;border-bottom:2px solid var(--ink);padding-bottom:.4rem;margin-bottom:.7rem}
+.cert header h3{font-size:1.6rem}
+.cert dl{margin:0;display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:.1rem .9rem}
+.cert dt{color:var(--muted);font-size:.9rem;padding:.3rem 0 .3rem .4rem}
+.cert dd{margin:0;padding:.25rem .4rem;font-weight:700;overflow-wrap:anywhere}
+.cert .flag{background:var(--flag)}
+@media (max-width:520px){.cert dl{grid-template-columns:1fr;gap:0}.cert dt{padding-bottom:0}.cert dd{padding-top:0;margin-bottom:.35rem}}
+.chain{margin-top:.9rem;border-top:1px dashed var(--line);padding:.7rem .4rem .2rem}
+.chain.flag{background:var(--flag)}
+.chain ol{margin:.3rem 0 0;padding:0;list-style:none;display:grid;gap:.4rem}
+.chain li{border:1px solid var(--line);border-radius:4px;padding:.35rem .6rem;background:var(--surface)}
+.chain li b{display:block}
+.stamp{position:absolute;right:1.2rem;top:4.6rem;transform:rotate(-9deg);border:4px double currentColor;border-radius:6px;padding:.1em .5em;font:700 clamp(1.5rem,5vw,2.3rem)/1.2 "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.05em;text-transform:uppercase;background:color-mix(in srgb,var(--raised) 80%,transparent);animation:stamp .25s ease-out}
+.stamp.ok{color:var(--ok)}.stamp.no{color:var(--no)}
+@keyframes stamp{from{transform:rotate(-9deg) scale(1.7);opacity:0}}
+@media (prefers-reduced-motion:reduce){.stamp{animation:none}}
+@media (max-width:520px){.stamp{position:static;display:inline-block;margin:.9rem 0 0 .4rem}}
+
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.choices button{padding:1rem;border-radius:6px;border:3px solid;font:700 1.5rem/1 "Barlow Condensed","Arial Narrow",sans-serif;background:var(--surface)}
+.choices .no{border-color:var(--no);color:var(--no)}
+.choices .ok{border-color:var(--ok);color:var(--ok)}
+.hint{color:var(--muted);font-size:.9rem;margin:.5rem 0 0}
+.reasons{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));margin:.5rem 0}
+.reasons button,.opts button{text-align:left;background:var(--surface);border:2px solid var(--ink);border-radius:6px;padding:.6rem .8rem;font-weight:500}
+.fb{background:var(--surface);border:1px solid var(--line);border-left:8px solid var(--ok);border-radius:6px;padding:1rem 1.1rem}
+.fb.w{border-left-color:var(--no)}
+.fb h3{margin-bottom:.4rem}
+.fb .tip{border-top:1px dashed var(--line);padding-top:.6rem;color:var(--muted)}
+.fb .tip b{color:var(--ink)}
+
+/* Auswertung, Quiz, Lexikon */
+.sum{list-style:none;padding:0;margin:1rem 0;border-top:1px solid var(--line);max-width:720px}
+.sum li{display:flex;gap:.8rem;padding:.4rem 0;border-bottom:1px solid var(--line)}
+.sum .m{font-weight:700;width:5.5rem;flex:none}
+.sum .m.r{color:var(--ok)}.sum .m.w{color:var(--no)}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem}
+.quiz{max-width:720px}
+.quiz .q{font-size:1.2rem;font-weight:500;margin:.6rem 0 1rem}
+.opts{display:grid;gap:.5rem;margin-bottom:1rem}
+.opts button[disabled]{cursor:default;opacity:.75}
+.opts button.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--surface));opacity:1}
+.opts button.wrong{border-color:var(--no);background:color-mix(in srgb,var(--no) 16%,var(--surface));opacity:1}
+.lex{max-width:760px}
+.lex details{border-bottom:1px solid var(--line);padding:.6rem 0}
+.lex summary{font:600 1.3rem/1.2 "Barlow Condensed","Arial Narrow",sans-serif;cursor:pointer}
+.lex details > div{padding:.5rem 0 .2rem}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;min-width:420px}
+th,td{text-align:left;padding:.3rem .8rem .3rem 0;border-bottom:1px solid var(--line);vertical-align:top}
+pre{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:.6rem .8rem;overflow-x:auto;font:400 .9rem/1.5 "Courier Prime","Courier New",monospace;margin:.3rem 0 .8rem}
+code{font-family:"Courier Prime","Courier New",monospace;font-weight:700}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <button class="brand" data-act="tab" data-v="home">Certificate Please!</button>
+    <nav aria-label="Bereiche">
+      <button data-act="tab" data-v="home" data-tab="home">Kontrolle</button>
+      <button data-act="tab" data-v="quiz" data-tab="quiz">Kundenfälle</button>
+      <button data-act="tab" data-v="lex" data-tab="lex">Nachschlagen</button>
+    </nav>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* ---------- Hilfen ---------- */
+const app = document.getElementById('app');
+const DAY = 864e5;
+const NOW = new Date(); NOW.setHours(12,0,0,0);
+const day = n => new Date(NOW.getTime() + n*DAY);
+const fmt = d => d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+const esc = s => String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const hash = s => [...s].reduce((a,c) => (a*37 + c.charCodeAt(0)) % 99991, 7);
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const store = { get(){ try{ return JSON.parse(localStorage.getItem('zk-best')||'{}'); }catch(e){ return {}; } },
+                set(v){ try{ localStorage.setItem('zk-best', JSON.stringify(v)); }catch(e){} } };
+
+/* ---------- Daten: Kontrolle ---------- */
+const STORE = ['Nordtor Root CA','Rheinsiegel Root CA','Globus Trust Root'];
+const REASONS = { datum:'Datum stimmt nicht', name:'Name passt nicht', kette:'Aussteller oder Kette nicht vertrauenswürdig', gesperrt:'Zertifikat ist widerrufen' };
+const C = o => Object.assign({ san:[o.cn], from:-60, to:140, issuer:'Nordtor DV CA 2', chain:[['Nordtor DV CA 2','Nordtor Root CA']], store:STORE, revoked:null, clock:0, device:'Dein Rechner', tip:'' }, o);
+
+const LEVELS = [
+ { id:1, name:'Datum', sub:'Gültig von, gültig bis',
+   brief:['Jedes Zertifikat hat ein Start- und ein Enddatum.','Vergleiche beide mit dem Datum deiner Systemuhr. Liegt heute nicht dazwischen: abweisen.','In dieser Schicht stimmen Name und Aussteller immer.'] },
+ { id:2, name:'Name', sub:'Passt der Ausweis zur aufgerufenen Adresse?',
+   brief:['Die aufgerufene Adresse muss in der Liste »Gilt für« stehen. Nur diese Liste zählt (sie heißt SAN).','Ein Stern ersetzt genau eine Ebene: *.firma.de passt auf mail.firma.de.','Er passt nicht auf a.b.firma.de und nicht auf firma.de selbst.'] },
+ { id:3, name:'Aussteller und Kette', sub:'Wer hat unterschrieben, und kennst du ihn?',
+   brief:['Jedes Zertifikat nennt seinen Aussteller. Der Server liefert die Zwischenzertifikate mit.','Folge der Kette von Aussteller zu Aussteller. Am Ende muss eine Root stehen, die in deinem Trust Store liegt.','Fehlt ein Glied, ist die Root unbekannt oder hat der Server sich selbst unterschrieben: abweisen.'] },
+ { id:4, name:'Sperrung und Sonderfälle', sub:'Widerrufene Zertifikate und ein paar Fallen',
+   brief:['Eine CA kann ein Zertifikat vor Ablauf sperren, etwa wenn der private Schlüssel gestohlen wurde.','Prüfe ab jetzt auch die Sperrabfrage.','Außerdem kann alles aus den ersten drei Schichten vorkommen.'] },
+ { id:5, name:'Gemischte Schicht', sub:'Zehn zufällige Fälle aus allen Regeln',
+   brief:['Zehn Fälle quer durch alle Regeln, in zufälliger Reihenfolge.','Prüfe jedes Mal alle vier Punkte: Datum, Name, Kette, Sperrung.'] }
+];
+
+const CASES = [
+ /* Schicht 1 */
+ C({lvl:1,target:'shop.firma.de',cn:'shop.firma.de',
+    why:'Heute liegt zwischen Start- und Enddatum. Alles in Ordnung.'}),
+ C({lvl:1,target:'www.kunde.de',cn:'www.kunde.de',from:-200,to:-1,
+    why:'Seit gestern abgelaufen. Ein Tag reicht, der Browser macht keine Ausnahme. Ob dahinter ein Angreifer steckt oder ein Admin, der die Verlängerung vergessen hat, kannst du nicht erkennen.',
+    tip:'Ablaufdaten gehören ins Monitoring, mit mindestens 14 Tagen Vorwarnung.'}),
+ C({lvl:1,target:'mail.firma.de',cn:'mail.firma.de',from:-198,to:2,
+    why:'Läuft erst übermorgen ab, ist also noch gültig.',
+    tip:'Für den Admin ist das trotzdem ein Alarm: jetzt erneuern.'}),
+ C({lvl:1,target:'portal.kunde.de',cn:'portal.kunde.de',from:3,to:203,
+    why:'Das Zertifikat gilt erst in drei Tagen. Vor dem Startdatum ist es genauso ungültig wie nach dem Enddatum.',
+    tip:'Passiert, wenn ein Zertifikat zu früh eingespielt wird oder eine Uhr falsch geht.'}),
+ C({lvl:1,target:'cloud.firma.de',cn:'cloud.firma.de',from:-1,to:199,
+    why:'Gestern ausgestellt, gilt 200 Tage. Länger darf ein öffentliches Zertifikat seit März 2026 nicht mehr laufen.'}),
+ C({lvl:1,target:'www.firma.de',cn:'www.firma.de',from:-30,to:170,clock:-4100,device:'Alter PC im Lager',
+    why:'Nach dieser Systemuhr gilt das Zertifikat noch gar nicht, also muss der Browser abweisen. Schau aufs Datum: Die Uhr des Rechners geht um Jahre nach. Das Zertifikat ist in Ordnung, der Fehler liegt beim Client.',
+    tip:'Meldet ein einzelner PC bei allen Seiten Zertifikatsfehler: zuerst Uhrzeit, Zeitserver und BIOS-Batterie prüfen.'}),
+ /* Schicht 2 */
+ C({lvl:2,target:'www.firma.de',cn:'www.firma.de',san:['www.firma.de','firma.de'],
+    why:'www.firma.de steht in der Liste. Passt.'}),
+ C({lvl:2,target:'mail.firma.de',cn:'www.firma.de',san:['www.firma.de','firma.de'],
+    why:'mail.firma.de steht nicht im Zertifikat. Ein Zertifikat für www.firma.de sagt nichts über mail.firma.de aus, auch wenn beide derselben Firma gehören.',
+    tip:'Typisch, wenn das Web-Zertifikat einfach auf den Mailserver kopiert wurde. Lösung: Reissue mit zusätzlichem Namen.'}),
+ C({lvl:2,target:'shop.firma.de',cn:'*.firma.de',san:['*.firma.de','firma.de'],
+    why:'Der Stern ersetzt genau eine Ebene. »shop« ist eine Ebene, also passt es.'}),
+ C({lvl:2,target:'dev.shop.firma.de',cn:'*.firma.de',san:['*.firma.de','firma.de'],
+    why:'Der Stern deckt nur eine Ebene ab. dev.shop.firma.de hat zwei Ebenen vor firma.de. Dafür bräuchte man *.shop.firma.de oder den Namen direkt in der Liste.'}),
+ C({lvl:2,target:'firma.de',cn:'*.firma.de',san:['*.firma.de'],
+    why:'*.firma.de verlangt irgendetwas vor dem Punkt. Die nackte Domain firma.de ist damit nicht abgedeckt, sie muss extra in der Liste stehen.',
+    tip:'Die meisten CAs tragen sie beim Wildcard automatisch mit ein. Trotzdem nachsehen.'}),
+ C({lvl:2,target:'portal.kunde.de',cn:'www.kunde.de',san:['www.kunde.de','kunde.de','portal.kunde.de'],
+    why:'Unter »Ausgestellt für« steht ein anderer Name, aber das Feld zählt nicht. Browser prüfen nur die Liste »Gilt für«, und dort steht portal.kunde.de.'}),
+ C({lvl:2,target:'192.168.10.1',cn:'firewall.firma.de',
+    why:'Aufgerufen wurde die IP-Adresse, im Zertifikat steht nur der Name. Für den Browser sind das zwei verschiedene Dinge.',
+    tip:'Der Klassiker bei Firewall- und Switch-Oberflächen. Über den DNS-Namen aufrufen statt über die IP.'}),
+ C({lvl:2,target:'firma.de',cn:'firrna.de',san:['firrna.de','www.firrna.de'],
+    why:'Lies genau: Im Zertifikat steht firrna.de, mit r und n statt m. Jemand hat eine Vertipper-Domain registriert und gibt sich damit als firma.de aus.'}),
+ /* Schicht 3 */
+ C({lvl:3,target:'www.kunde.de',cn:'www.kunde.de',
+    why:'Die Kette ist vollständig: Das Server-Zertifikat stammt von Nordtor DV CA 2, die wiederum von Nordtor Root CA. Diese Root liegt in deinem Trust Store.'}),
+ C({lvl:3,target:'www.firma.de',cn:'www.firma.de',issuer:'www.firma.de',chain:[],
+    why:'Aussteller und Inhaber sind identisch: Der Server hat sich den Ausweis selbst geschrieben. Das kann jeder, auch ein Angreifer.',
+    tip:'Selbstsigniert ist nur für Tests in Ordnung. Kunden nie beibringen, die Warnung wegzuklicken.'}),
+ C({lvl:3,target:'shop.firma.de',cn:'shop.firma.de',issuer:'SecureFast TLS CA',chain:[['SecureFast TLS CA','SecureFast Root']],
+    why:'Die Kette ist lückenlos, endet aber bei SecureFast Root. Diese Root liegt nicht in deinem Trust Store, also ist die ganze Kette nichts wert.'}),
+ C({lvl:3,target:'mail.kunde.de',cn:'mail.kunde.de',issuer:'Rheinsiegel TLS CA 1',chain:[],
+    why:'Der Aussteller Rheinsiegel TLS CA 1 ist ein Zwischenzertifikat. Der Server hat es nicht mitgeliefert, und in deinem Trust Store liegen nur Roots. Die Verbindung zur Rheinsiegel Root CA lässt sich nicht herstellen.',
+    tip:'Kein Angriff, sondern der häufigste Konfigurationsfehler. Manche Browser holen das Zwischenzertifikat selbst nach, darum fällt es oft erst bei Apps, curl oder Mailprogrammen auf. Lösung: Zwischenzertifikat auf dem Server nachinstallieren.'}),
+ C({lvl:3,target:'intranet.firma.local',cn:'intranet.firma.local',issuer:'Firma Issuing CA',chain:[['Firma Issuing CA','Firma Intern Root CA']],store:[...STORE,'Firma Intern Root CA'],device:'Firmen-Laptop',
+    why:'Die Root der firmeneigenen CA liegt im Trust Store dieses Laptops, weil die IT sie verteilt hat. Damit ist die Kette gültig.'}),
+ C({lvl:3,target:'intranet.firma.local',cn:'intranet.firma.local',issuer:'Firma Issuing CA',chain:[['Firma Issuing CA','Firma Intern Root CA']],device:'Privates Handy',
+    why:'Gleicher Server, gleiches Zertifikat, anderes Gerät. Auf dem privaten Handy fehlt die Firmen-Root, also endet die Kette hier im Unbekannten.',
+    tip:'Interne CAs funktionieren nur auf Geräten, die die Root bekommen haben, per Gruppenrichtlinie oder MDM.'}),
+ C({lvl:3,target:'cloud.kunde.de',cn:'cloud.kunde.de',issuer:'Globus TLS CA G3',chain:[['Globus TLS CA G3','Globus Regional CA'],['Globus Regional CA','Globus Trust Root']],
+    why:'Zwei Zwischenzertifikate, beide mitgeliefert. Die Kette darf länger sein, solange kein Glied fehlt und am Ende eine bekannte Root steht.'}),
+ /* Schicht 4 */
+ C({lvl:4,target:'shop.kunde.de',cn:'shop.kunde.de',revoked:-18,
+    why:'Datum, Name und Kette stimmen. Aber die CA hat das Zertifikat vor 18 Tagen gesperrt, weil der private Schlüssel in fremde Hände geraten ist. Wer es jetzt noch vorlegt, kann der Dieb sein.'}),
+ C({lvl:4,target:'firma-rechnungsportal.de',cn:'firma-rechnungsportal.de',device:'Link aus einer Mail angeklickt',
+    why:'Das Zertifikat ist einwandfrei, also muss der Browser durchlassen und zeigt das Schloss. Es beweist nur, dass du wirklich mit firma-rechnungsportal.de sprichst. Ob diese Seite seriös ist, sagt es nicht.',
+    tip:'Phishing-Seiten haben fast immer gültige Zertifikate. Das Schloss heißt »verschlüsselt und echt benannt«, nicht »vertrauenswürdig«. Das solltest du Kunden so erklären können.'}),
+ C({lvl:4,target:'drucker.firma.de',cn:'drucker.firma.de',issuer:'drucker.firma.de',chain:[],from:-400,to:-35,
+    why:'Gleich zwei Gründe: abgelaufen und selbstsigniert. Einer hätte gereicht.',
+    tip:'So sehen Geräte aus, die seit der Installation niemand mehr angefasst hat: Drucker, Kameras, alte NAS.'}),
+ C({lvl:4,target:'vpn.firma.de',cn:'www.firma.de',san:['www.firma.de','mail.firma.de','shop.firma.de','vpm.firma.de','cloud.firma.de'],
+    why:'In der Liste steht vpm.firma.de, nicht vpn.firma.de. Ein Tippfehler im CSR reicht, und der Name passt nicht.',
+    tip:'Lösung: Reissue mit korrigiertem Namen. Das Ablaufdatum bleibt gleich.'}),
+ C({lvl:4,target:'mail.kunde.de',cn:'*.kunde.de',san:['*.kunde.de','kunde.de'],from:-195,to:5,issuer:'Rheinsiegel TLS CA 1',chain:[['Rheinsiegel TLS CA 1','Rheinsiegel Root CA']],
+    why:'Wildcard passt, Kette vollständig, nicht gesperrt, noch fünf Tage gültig. Knapp, aber gültig.'}),
+ C({lvl:4,target:'api.kunde.de',cn:'api.kunde.de',issuer:'Globus TLS CA G3',chain:[['Globus TLS CA G3','Globus Regional CA']],
+    why:'Der Server liefert ein Zwischenzertifikat mit, aber das zweite fehlt: Globus Regional CA ist weder mitgeliefert noch in deinem Trust Store. Die Kette reißt vor der Root ab.',
+    tip:'Beim Einspielen immer die komplette Kettendatei der CA verwenden (oft »fullchain« oder »CA-Bundle« genannt).'})
+];
+
+/* Prüflogik: bestimmt aus den Daten, was richtig ist */
+function nameOk(target, san){
+  return san.some(n => n.startsWith('*.') ? (target.endsWith(n.slice(1)) && !target.slice(0, -n.length+1).includes('.') && target.length > n.length-1) : n === target);
+}
+function chainOk(c){
+  if (c.issuer === c.cn) return false;
+  let iss = c.issuer, guard = 0;
+  while (guard++ < 6){
+    if (c.store.includes(iss)) return true;
+    const link = c.chain.find(x => x[0] === iss);
+    if (!link) return false;
+    iss = link[1];
+  }
+  return false;
+}
+function verdict(c){
+  const r = [];
+  if (c.clock < c.from || c.clock > c.to) r.push('datum');
+  if (!nameOk(c.target, c.san)) r.push('name');
+  if (!chainOk(c)) r.push('kette');
+  if (c.revoked !== null) r.push('gesperrt');
+  return { ok: r.length === 0, reasons: r };
+}
+
+/* ---------- Daten: Kundenfälle ---------- */
+const QUIZ = [
+ { q:'Ein Kunde schickt dir sein Zertifikat samt privatem Schlüssel als Mail-Anhang, damit du es einspielst.',
+   o:['Neuen Schlüssel und CSR erzeugen, Reissue beantragen, das alte Zertifikat widerrufen lassen','Einspielen, es war ja nur eine Mail','Mail löschen und dann einspielen','Ein Renew bestellen'],
+   why:'Ein privater Schlüssel, der unverschlüsselt per Mail lief, gilt als kompromittiert. Löschen ändert daran nichts. Ein Renew mit demselben Schlüssel auch nicht.' },
+ { q:'Das Zertifikat von shop.kunde.de läuft in 12 Tagen ab. Sonst soll sich nichts ändern.',
+   o:['Renew','Reissue','Revoke','Abwarten, der Browser warnt erst nach Ablauf'],
+   why:'Neue Laufzeit heißt Renew. Reissue verlängert nichts, es ändert nur Inhalt oder Schlüssel bei gleichem Ablaufdatum.' },
+ { q:'Der Kunde will zusätzlich api.kunde.de im bestehenden Zertifikat. Es läuft noch vier Monate.',
+   o:['Reissue mit dem zusätzlichen Namen','Renew','Ein zweites Zertifikat kaufen und beide gleichzeitig einbinden','Den Namen in der Zertifikatsdatei ergänzen'],
+   why:'Inhalt ändern bei gleicher Laufzeit ist ein Reissue. Die Datei selbst bearbeiten geht nicht: Jede Änderung zerstört die Signatur der CA.' },
+ { q:'Du hast server.crt, intermediate.crt und server.key. Der Kunde nutzt einen Windows-Server mit IIS.',
+   o:['Mit openssl alles in eine PFX-Datei packen und importieren','server.crt in server.pfx umbenennen','Nur server.crt importieren, der Schlüssel ist optional','Einen neuen CSR erzeugen'],
+   why:'Windows will Zertifikat, Kette und privaten Schlüssel zusammen in einer passwortgeschützten PFX. Ohne Schlüssel kann der Server das Zertifikat nicht benutzen.' },
+ { q:'Die Website funktioniert in Chrome am PC. Die Android-App und curl melden einen Zertifikatsfehler.',
+   o:['Auf dem Server fehlt das Zwischenzertifikat','Das Zertifikat ist abgelaufen','Der Name im Zertifikat ist falsch','Die App braucht ein eigenes Zertifikat'],
+   why:'Desktop-Browser holen fehlende Zwischenzertifikate oft selbst nach oder haben sie im Cache. Andere Clients tun das nicht. Abgelaufen oder falscher Name würde überall scheitern.' },
+ { q:'Was schickst du an die CA, um ein Zertifikat zu beantragen?',
+   o:['Nur den CSR','CSR und privaten Schlüssel','Nur den privaten Schlüssel','Das alte Zertifikat als PFX'],
+   why:'Der CSR enthält den öffentlichen Schlüssel und die Angaben. Der private Schlüssel verlässt den Server nie, auch nicht Richtung CA.' },
+ { q:'Der Kunde will HTTPS ohne Warnung für intranet.firma.local. Die Seite ist nur intern erreichbar.',
+   o:['Zertifikat von der internen CA, deren Root per Gruppenrichtlinie verteilt wird','Let’s Encrypt','Selbstsigniert, und die Mitarbeiter klicken die Warnung weg','Ein öffentliches Wildcard-Zertifikat für *.local'],
+   why:'Öffentliche CAs stellen für .local nichts aus, weil niemand den Besitz nachweisen kann. Warnungen wegklicken trainiert den Mitarbeitern genau das Verhalten an, das Angreifer brauchen.' },
+ { q:'Hinter einem Reverse Proxy laufen 14 Subdomains von kunde.de, jeden Monat kommen neue dazu.',
+   o:['Ein Wildcard-Zertifikat *.kunde.de auf dem Proxy','14 Einzelzertifikate von Hand pflegen','Ein EV-Zertifikat','Ein Zertifikat für kunde.de reicht für alle Subdomains'],
+   why:'Der Wildcard deckt neue Subdomains automatisch ab, und der Schlüssel liegt nur an einer Stelle. Alternative: Einzelzertifikate automatisch per ACME. Ein Zertifikat für kunde.de gilt nur für genau diesen Namen.' },
+ { q:'Nach dem Einspielen meldet der Webserver, dass der Schlüssel nicht zum Zertifikat passt.',
+   o:['Das Zertifikat wurde zu einem anderen CSR ausgestellt. Mit dem aktuellen CSR ein Reissue beantragen','Den Server neu starten','Das Zwischenzertifikat fehlt','Den Schlüssel bei der CA herunterladen'],
+   why:'Zertifikat und privater Schlüssel sind ein Paar. Wurde nach der Bestellung ein neuer CSR erzeugt, passt der alte Antrag nicht mehr. Die CA hat deinen privaten Schlüssel nie gehabt und kann ihn nicht liefern.' },
+ { q:'Ein einzelner PC beim Kunden meldet bei fast jeder Website »Zertifikat noch nicht gültig«.',
+   o:['Datum und Uhrzeit des PCs prüfen','Alle Zertifikate der Websites sind defekt','Den Browser-Cache leeren','Die Root-Zertifikate löschen'],
+   why:'Wenn alle Seiten gleichzeitig betroffen sind und nur ein Gerät, liegt es am Gerät. »Noch nicht gültig« heißt: Die Uhr des PCs steht in der Vergangenheit.' },
+ { q:'Der Kunde fragt, ob er für den Webshop ein teures EV-Zertifikat braucht, weil das stärker verschlüsselt.',
+   o:['Nein. Die Verschlüsselung ist bei DV, OV und EV gleich stark','Ja, EV verschlüsselt mit längeren Schlüsseln','Ja, sonst zeigen Browser kein Schloss','Nur wenn er Kreditkarten annimmt'],
+   why:'DV, OV und EV unterscheiden sich nur darin, wie gründlich die CA den Antragsteller prüft. Browser zeigen den Unterschied kaum noch an.' },
+ { q:'Ein Wildcard-Zertifikat liegt mit demselben Schlüssel auf neun Servern. Einer davon wird gehackt.',
+   o:['Zertifikat widerrufen, neuen Schlüssel erzeugen, auf allen neun Servern tauschen','Nur auf dem gehackten Server das Zertifikat löschen','Abwarten bis zum Ablaufdatum','Renew mit demselben Schlüssel'],
+   why:'Der Angreifer hat den Schlüssel und kann sich damit als jede Subdomain ausgeben. Darum: widerrufen und überall ersetzen. Deshalb verteilt man Wildcards sparsam.' }
+];
+
+/* ---------- Daten: Nachschlagen ---------- */
+const LEX = [
+ ['Zertifikat','<p>Ein digitaler Ausweis für einen Server. Darin steht, zu welchem Namen ein öffentlicher Schlüssel gehört, unterschrieben von einer CA. Der Browser prüft damit, ob er wirklich mit dem richtigen Server spricht, und baut dann eine verschlüsselte Verbindung auf.</p>'],
+ ['Schlüsselpaar','<p>Zwei zusammengehörige Schlüssel. Der private bleibt geheim auf dem Server. Der öffentliche steht im Zertifikat. Wer den privaten Schlüssel hat, kann sich als dieser Server ausgeben. Darum nie per Mail oder Ticket verschicken.</p>'],
+ ['CA (Zertifizierungsstelle)','<p>Die Stelle, die Zertifikate ausstellt und unterschreibt. Öffentliche CAs sind zum Beispiel Let’s Encrypt, DigiCert oder Sectigo. Eine interne CA (etwa die Active-Directory-Zertifikatdienste) gilt nur auf Geräten, die ihre Root bekommen haben.</p>'],
+ ['Kette und Trust Store','<p>Die Root-CA unterschreibt ein Zwischenzertifikat, das Zwischenzertifikat unterschreibt dein Server-Zertifikat. Der Trust Store ist die Liste der Roots, denen Betriebssystem oder Browser vertrauen. Der Server muss sein Zertifikat und alle Zwischenzertifikate ausliefern, die Root nicht.</p>'],
+ ['CSR','<p>Der Antrag an die CA. Du erzeugst auf dem Server ein Schlüsselpaar und daraus den CSR. Er enthält den öffentlichen Schlüssel und die gewünschten Namen. Die CA prüft, ob dir die Domain gehört, und stellt das Zertifikat aus. Der private Schlüssel bleibt bei dir.</p>'],
+ ['Renew','<p>Verlängerung: neues Zertifikat mit neuem Ablaufdatum. Am besten gleich mit neuem Schlüssel und neuem CSR.</p>'],
+ ['Reissue','<p>Neuausstellung innerhalb der Laufzeit. Das Ablaufdatum bleibt. Gründe: Schlüssel verloren oder kompromittiert, Name ergänzen oder korrigieren, Zertifikat passt nicht zum Schlüssel.</p>'],
+ ['Revoke (Widerruf)','<p>Die CA erklärt ein Zertifikat vor Ablauf für ungültig. Clients erfahren das über Sperrlisten (CRL) oder eine Online-Abfrage (OCSP). Nötig, sobald der private Schlüssel in falsche Hände geraten sein könnte.</p>'],
+ ['DV, OV, EV','<p>Wie gründlich die CA prüft. DV: nur die Kontrolle über die Domain. OV: zusätzlich die Firma. EV: die strengste Firmenprüfung. Die Verschlüsselung ist bei allen gleich stark.</p>'],
+ ['SAN und Wildcard','<p>SAN ist die Liste der Namen, für die ein Zertifikat gilt. Nur sie zählt. Ein Wildcard wie <code>*.firma.de</code> deckt genau eine Ebene ab: <code>mail.firma.de</code> ja, <code>a.b.firma.de</code> nein, <code>firma.de</code> nur, wenn es extra in der Liste steht.</p>'],
+ ['Laufzeiten','<p>Öffentliche Zertifikate gelten seit März 2026 höchstens 200 Tage, ab März 2027 100 Tage, ab März 2029 nur noch 47. Manuelles Verlängern lohnt sich immer weniger. Automatisieren per ACME (zum Beispiel certbot), wo es geht.</p>'],
+ ['Dateiformate','<div class="scroll"><table><tr><th>Endung</th><th>Inhalt</th></tr><tr><td><code>.pem .crt .cer</code></td><td>Zertifikat, meist als Text</td></tr><tr><td><code>.key</code></td><td>Privater Schlüssel</td></tr><tr><td><code>.csr</code></td><td>Der Antrag</td></tr><tr><td><code>.pfx .p12</code></td><td>Zertifikat, Kette und Schlüssel in einer Datei, mit Passwort (Windows)</td></tr><tr><td><code>.p7b</code></td><td>Zertifikat und Kette, ohne Schlüssel</td></tr></table></div>'],
+ ['Befehle','<p>Zertifikat lesen:</p><pre>openssl x509 -in cert.pem -noout -text</pre><p>Sehen, was ein Server ausliefert, samt Kette:</p><pre>openssl s_client -connect firma.de:443 -servername firma.de</pre><p>Schlüssel und CSR erzeugen:</p><pre>openssl req -new -newkey rsa:2048 -nodes -keyout server.key -out server.csr</pre><p>PEM und Schlüssel zu PFX packen:</p><pre>openssl pkcs12 -export -out server.pfx -inkey server.key -in server.crt -certfile intermediate.crt</pre>']
+];
+
+/* ---------- Zustand ---------- */
+let view = 'home';
+let S = null;   // Kontrolle
+let Q = null;   // Kundenfälle
+
+function setTab(t){
+  document.querySelectorAll('[data-tab]').forEach(b => b.dataset.tab === t ? b.setAttribute('aria-current','page') : b.removeAttribute('aria-current'));
+}
+
+/* ---------- Ansichten: Kontrolle ---------- */
+function home(){
+  view = 'home'; setTab('home');
+  const best = store.get();
+  app.innerHTML = `
+  <h1>Du bist der Browser.</h1>
+  <p class="lead" style="margin-top:.8rem">Jeder Server, der zu dir will, legt ein Zertifikat vor. Prüfe es und entscheide: durchlassen oder abweisen. Nach jedem Fall steht da, warum.</p>
+  <ol class="shifts">
+    ${LEVELS.map(l => `<li>
+      <span class="num">${l.id}</span>
+      <div><h3>${esc(l.name)}</h3><span class="best">${esc(l.sub)}${best[l.id] ? `. Bestes Ergebnis: ${best[l.id].r} von ${best[l.id].n} richtig` : ''}</span></div>
+      <button class="btn small" data-act="brief" data-v="${l.id}">Schicht ${l.id} öffnen</button>
+    </li>`).join('')}
+  </ol>
+  <div class="more">
+    <div><h3>Kundenfälle</h3><p>Zwölf Situationen aus dem Alltag beim Kunden. Vier Antworten, eine richtige.</p><button class="btn ghost small" data-act="tab" data-v="quiz">Kundenfälle öffnen</button></div>
+    <div><h3>Nachschlagen</h3><p>Alle Begriffe kurz erklärt, dazu Dateiformate und die wichtigsten Befehle.</p><button class="btn ghost small" data-act="tab" data-v="lex">Nachschlagen öffnen</button></div>
+  </div>`;
+}
+
+function brief(id){
+  view = 'brief'; setTab('home');
+  const l = LEVELS.find(x => x.id === +id);
+  app.innerHTML = `<div class="brief">
+    <h2>Schicht ${l.id}: ${esc(l.name)}</h2>
+    <ul>${l.brief.map(b => `<li>${esc(b)}</li>`).join('')}</ul>
+    <p>Richtig entschieden gibt 10 Punkte. Beim Abweisen wirst du nach dem Grund gefragt, der richtige Grund gibt 5 dazu.</p>
+    <div class="row"><button class="btn" data-act="start" data-v="${l.id}">Schicht beginnen</button><button class="btn ghost" data-act="tab" data-v="home">Zur Übersicht</button></div>
+  </div>`;
+  app.querySelector('.btn').focus();
+}
+
+function start(id){
+  id = +id;
+  const queue = id === 5 ? shuffle(CASES).slice(0,10) : CASES.filter(c => c.lvl === id);
+  S = { lvl:id, queue, i:0, res:[], pts:0, phase:'decide', choice:null, fb:null };
+  play();
+}
+
+const creature = h => `<svg class="srv" viewBox="0 0 80 96" aria-hidden="true">
+  <rect x="10" y="6" width="60" height="68" rx="8" fill="hsl(${h} 32% 46%)"/>
+  <rect x="18" y="14" width="44" height="24" rx="4" fill="hsl(${h} 30% 18%)"/>
+  <circle cx="32" cy="26" r="5" fill="#fff"/><circle cx="48" cy="26" r="5" fill="#fff"/>
+  <circle cx="33.5" cy="27" r="2.2" fill="#111"/><circle cx="49.5" cy="27" r="2.2" fill="#111"/>
+  <rect x="18" y="46" width="44" height="4" rx="2" fill="hsl(${h} 30% 30%)"/>
+  <rect x="18" y="56" width="30" height="4" rx="2" fill="hsl(${h} 30% 30%)"/>
+  <circle cx="57" cy="58" r="3" fill="#7CE0A0"/>
+  <rect x="22" y="74" width="8" height="14" fill="hsl(${h} 30% 30%)"/><rect x="50" y="74" width="8" height="14" fill="hsl(${h} 30% 30%)"/>
+  <rect x="15" y="86" width="20" height="7" rx="3.5" fill="hsl(${h} 30% 24%)"/><rect x="45" y="86" width="20" height="7" rx="3.5" fill="hsl(${h} 30% 24%)"/>
+</svg>`;
+
+function play(){
+  view = 'play'; setTab('home');
+  const c = S.queue[S.i], l = LEVELS.find(x => x.id === S.lvl), h = hash(c.target + c.cn);
+  const show = S.phase === 'done' ? verdict(c).reasons : [];
+  const fl = k => show.includes(k) ? ' class="flag"' : '';
+  const serial = (h*7919).toString(16).toUpperCase().padStart(8,'0').slice(0,8).match(/../g).join(':');
+  const rev = c.issuer === c.cn ? 'Keine CA, also auch keine Sperrliste' : c.revoked === null ? 'Nicht gesperrt' : `Gesperrt seit ${fmt(day(c.revoked))}. Grund: Schlüssel kompromittiert`;
+  app.innerHTML = `
+  <div class="status">
+    <h2>Schicht ${l.id}: ${esc(l.name)}</h2>
+    <span>Fall ${S.i+1} von ${S.queue.length}</span>
+    <span class="pips" aria-hidden="true">${S.queue.map((_,i) => `<i class="${S.res[i] ? (S.res[i].right ? 'r' : 'w') : i === S.i ? 'cur' : ''}"></i>`).join('')}</span>
+    <span class="points">${S.pts} Punkte</span>
+  </div>
+  <div class="booth">
+    <div class="ask">
+      ${creature(h % 360)}
+      <div><small>Der Nutzer ruft auf</small><span class="target mono">https://${esc(c.target)}</span></div>
+      <div class="bubble">„Das bin ich. Hier ist mein Ausweis.“</div>
+    </div>
+    <article class="cert" aria-label="Vorgelegtes Zertifikat">
+      <header><h3>Zertifikat</h3><small class="mono">Nr. ${serial}</small></header>
+      <dl class="mono">
+        <dt>Ausgestellt für</dt><dd>${esc(c.cn)}</dd>
+        <dt${fl('name')}>Gilt für</dt><dd${fl('name')}>${c.san.map(esc).join('<br>')}</dd>
+        <dt${fl('datum')}>Gültig von</dt><dd${fl('datum')}>${fmt(day(c.from))}</dd>
+        <dt${fl('datum')}>Gültig bis</dt><dd${fl('datum')}>${fmt(day(c.to))}</dd>
+        <dt${fl('kette')}>Ausgestellt von</dt><dd${fl('kette')}>${esc(c.issuer)}</dd>
+      </dl>
+      <div class="chain${show.includes('kette') ? ' flag' : ''}">
+        <small>Zwischenzertifikate, die der Server mitliefert</small>
+        ${c.chain.length ? `<ol class="mono">${c.chain.map(x => `<li><b>${esc(x[0])}</b><small>ausgestellt von ${esc(x[1])}</small></li>`).join('')}</ol>` : '<p class="mono" style="margin:.3rem 0 0;font-weight:700">Keine</p>'}
+      </div>
+      ${S.phase === 'done' ? `<div class="stamp ${S.choice}">${S.choice === 'ok' ? 'Durchgelassen' : 'Abgewiesen'}</div>` : ''}
+    </article>
+    <div class="tools">
+      <div class="tool${show.includes('datum') ? ' flag' : ''}"><small>Systemuhr (${esc(c.device)})</small><span class="clock mono">${fmt(day(c.clock))}</span></div>
+      <div class="tool${show.includes('kette') ? ' flag' : ''}"><small>Dein Trust Store</small><ul class="mono">${c.store.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>
+      <div class="tool${show.includes('gesperrt') ? ' flag' : ''}"><small>Sperrabfrage bei der CA</small><span class="mono" style="font-weight:700">${rev}</span></div>
+    </div>
+    <div class="act" aria-live="polite">${actHTML(c)}</div>
+  </div>`;
+  const f = app.querySelector('[data-focus]'); if (f) f.focus();
+}
+
+function actHTML(c){
+  if (S.phase === 'decide') return `
+    <div class="choices">
+      <button class="no" data-act="decide" data-v="no">Abweisen</button>
+      <button class="ok" data-act="decide" data-v="ok">Durchlassen</button>
+    </div>
+    <p class="hint">Tastatur: Pfeil links weist ab, Pfeil rechts lässt durch.</p>`;
+  if (S.phase === 'reason') return `
+    <h3>Warum weist du ab?</h3>
+    <div class="reasons">${Object.entries(REASONS).map(([k,t],i) => `<button data-act="reason" data-v="${k}"${i===0?' data-focus':''}>${i+1}. ${esc(t)}</button>`).join('')}</div>
+    <button class="btn ghost small" data-act="back">Doch nicht abweisen</button>`;
+  const f = S.fb, last = S.i === S.queue.length - 1;
+  return `<div class="fb${f.right && !f.half ? '' : ' w'}">
+    <h3>${esc(f.head)}</h3>
+    <p>${esc(c.why)}</p>
+    ${c.tip ? `<p class="tip"><b>In der Praxis:</b> ${esc(c.tip)}</p>` : ''}
+    <button class="btn" data-act="next" data-focus>${last ? 'Schicht auswerten' : 'Nächster Fall'}</button>
+  </div>`;
+}
+
+function settle(choice, reason){
+  const c = S.queue[S.i], v = verdict(c);
+  const right = (choice === 'ok') === v.ok;
+  let pts = 0, head, half = false;
+  if (right && v.ok){ pts = 10; head = 'Richtig durchgelassen.'; }
+  else if (right && v.reasons.includes(reason)){ pts = 15; head = 'Richtig abgewiesen, richtiger Grund.'; }
+  else if (right){ pts = 10; half = true; head = 'Richtig abgewiesen, aber der Grund war ein anderer: ' + v.reasons.map(r => REASONS[r]).join(' und ') + '.'; }
+  else if (v.ok){ head = 'Falsch. Dieses Zertifikat war in Ordnung.'; }
+  else { head = 'Falsch. Das hättest du abweisen müssen: ' + v.reasons.map(r => REASONS[r]).join(' und ') + '.'; }
+  S.pts += pts; S.choice = choice; S.phase = 'done';
+  S.fb = { right, half, head };
+  S.res[S.i] = { right, target:c.target, reasons:v.reasons };
+  play();
+}
+
+function levelEnd(){
+  view = 'end';
+  const n = S.queue.length, r = S.res.filter(x => x.right).length, l = LEVELS.find(x => x.id === S.lvl);
+  const best = store.get();
+  if (!best[S.lvl] || r > best[S.lvl].r){ best[S.lvl] = { r, n }; store.set(best); }
+  const verdictText = r === n ? 'Fehlerfrei.' : r >= n*0.7 ? 'Solide. Schau dir die Fehler an, dann sitzt es.' : 'Das reicht noch nicht. Lies die Regeln noch einmal und wiederhole die Schicht.';
+  app.innerHTML = `
+  <h2>Schicht ${l.id} beendet</h2>
+  <p class="lead" style="margin-top:.5rem">${r} von ${n} richtig entschieden, ${S.pts} Punkte. ${verdictText}</p>
+  <ul class="sum">${S.res.map(x => `<li><span class="m ${x.right ? 'r' : 'w'}">${x.right ? 'Richtig' : 'Falsch'}</span><span><span class="mono">${esc(x.target)}</span><br><small style="color:var(--muted)">${x.reasons.length ? x.reasons.map(k => REASONS[k]).join(', ') : 'Zertifikat in Ordnung'}</small></span></li>`).join('')}</ul>
+  <div class="row">
+    ${S.lvl < 5 ? `<button class="btn" data-act="brief" data-v="${S.lvl+1}">Weiter zu Schicht ${S.lvl+1}</button>` : ''}
+    <button class="btn ghost" data-act="start" data-v="${S.lvl}">Schicht wiederholen</button>
+    <button class="btn ghost" data-act="tab" data-v="home">Zur Übersicht</button>
+  </div>`;
+}
+
+/* ---------- Ansichten: Kundenfälle ---------- */
+function quizHome(){
+  view = 'quiz'; setTab('quiz');
+  Q = { list: shuffle(QUIZ).map(q => ({ q:q.q, why:q.why, right:q.o[0], opts:shuffle(q.o) })), i:0, r:0, picked:null };
+  quizShow();
+}
+function quizShow(){
+  const q = Q.list[Q.i], done = Q.picked !== null, last = Q.i === Q.list.length - 1;
+  app.innerHTML = `<div class="quiz">
+    <div class="status"><h2>Kundenfälle</h2><span>Fall ${Q.i+1} von ${Q.list.length}</span><span class="points">${Q.r} richtig</span></div>
+    <p class="q">${esc(q.q)}</p>
+    <div class="opts">${q.opts.map((o,i) => `<button data-act="pick" data-v="${i}" ${done ? 'disabled' : ''} class="${done && o === q.right ? 'right' : done && i === Q.picked ? 'wrong' : ''}">${esc(o)}</button>`).join('')}</div>
+    <div aria-live="polite">${done ? `<div class="fb${q.opts[Q.picked] === q.right ? '' : ' w'}"><h3>${q.opts[Q.picked] === q.right ? 'Richtig.' : 'Falsch.'}</h3><p>${esc(q.why)}</p><button class="btn" data-act="qnext" data-focus>${last ? 'Auswertung ansehen' : 'Nächster Fall'}</button></div>` : ''}</div>
+  </div>`;
+  const f = app.querySelector('[data-focus]'); if (f) f.focus();
+}
+function quizEnd(){
+  const n = Q.list.length;
+  app.innerHTML = `<div class="quiz"><h2>Kundenfälle beendet</h2>
+    <p class="lead" style="margin-top:.5rem">${Q.r} von ${n} richtig. ${Q.r === n ? 'Fehlerfrei.' : Q.r >= n*0.75 ? 'Gut. Die Fehler noch einmal nachlesen.' : 'Hier fehlt noch Grundlage. Unter Nachschlagen stehen Renew, Reissue, CSR und die Dateiformate.'}</p>
+    <div class="row"><button class="btn" data-act="tab" data-v="quiz">Noch einmal, neu gemischt</button><button class="btn ghost" data-act="tab" data-v="lex">Nachschlagen öffnen</button></div></div>`;
+}
+
+/* ---------- Ansicht: Nachschlagen ---------- */
+function lex(){
+  view = 'lex'; setTab('lex');
+  app.innerHTML = `<div class="lex"><h2>Nachschlagen</h2>
+    <p style="margin-top:.5rem">Jeder Begriff in ein paar Sätzen. Aufklappen, was du brauchst.</p>
+    ${LEX.map(([t,h]) => `<details><summary>${esc(t)}</summary><div>${h}</div></details>`).join('')}</div>`;
+}
+
+/* ---------- Steuerung ---------- */
+const ACT = {
+  tab(v){ v === 'quiz' ? quizHome() : v === 'lex' ? lex() : home(); window.scrollTo(0,0); },
+  brief(v){ brief(v); window.scrollTo(0,0); },
+  start(v){ start(v); window.scrollTo(0,0); },
+  decide(v){ if (!S || S.phase !== 'decide') return; if (v === 'ok') settle('ok'); else { S.phase = 'reason'; play(); } },
+  reason(v){ if (S && S.phase === 'reason') settle('no', v); },
+  back(){ S.phase = 'decide'; play(); },
+  next(){ if (!S || S.phase !== 'done') return; if (S.i === S.queue.length - 1) levelEnd(); else { S.i++; S.phase = 'decide'; S.choice = null; play(); } window.scrollTo(0,0); },
+  pick(v){ if (Q.picked !== null) return; Q.picked = +v; if (Q.list[Q.i].opts[Q.picked] === Q.list[Q.i].right) Q.r++; quizShow(); },
+  qnext(){ if (Q.i === Q.list.length - 1) quizEnd(); else { Q.i++; Q.picked = null; quizShow(); } window.scrollTo(0,0); }
+};
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const fn = ACT[b.dataset.act]; if (fn) fn(b.dataset.v);
+});
+document.addEventListener('keydown', e => {
+  if (view !== 'play' || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (S.phase === 'decide'){
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); ACT.decide('no'); }
+    if (e.key === 'ArrowRight'){ e.preventDefault(); ACT.decide('ok'); }
+  } else if (S.phase === 'reason'){
+    const k = ['1','2','3','4'].indexOf(e.key);
+    if (k > -1) ACT.reason(Object.keys(REASONS)[k]);
+  }
+});
+home();
+</script>
+</body>
+</html>
